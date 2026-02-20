@@ -1,0 +1,21 @@
+# config\local.yaml
+
+# env
+env: "local"
+migrations_dir: "./database/migrations"
+
+# Goose
+db_dialect: "postgres"
+
+# Server
+http_server:
+  address: "0.0.0.0:8080"
+  timeout: 4s
+  idle_timeout: 60s
+
+# Postgres
+postgres:
+  max_open_conns: 50
+  max_idle_conns: 10
+  conn_max_lifetime: 30m
+  
