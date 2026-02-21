@@ -1,11 +1,22 @@
+# Makefile
+.SILENT:
+
 .PHONY: run build test lint clean
 
+include .env
+export
+
 # Variables
+# DSN
+DSN := "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_INTERNAL_PORT)/$(POSTGRES_DB)?sslmode=$(POSTGRES_SSLMODE)"
 
 APP_NAME=org_struct_api
 
-# MAKE Commands
+# Install goose
+goose-install:
+	go install github.com/pressly/goose/v3/cmd/goose@v3.26.0
 
+# MAKE Commands
 run:
 	go run cmd/api/main.go
 
@@ -17,3 +28,33 @@ up:
 
 down:
 	docker-compose down
+
+down-and-clean:
+	docker-compose down -v
+
+# Migrations
+
+# Create new migration (make create-migration NAME=name)
+create-migration:
+	goose -dir $(MIGRATIONS_DIR) create $(NAME) sql
+	@echo "Created migration: $(NAME)"
+
+# Apply migrations
+migrate-up:
+	@echo "Applying migrations..."
+	goose -dir $(MIGRATIONS_DIR) postgres $(DSN) up
+
+# Rollback last migration
+migrate-down:
+	@echo "Rolling back last migration..."
+	goose -dir $(MIGRATIONS_DIR) postgres $(DSN) down
+
+# Show migration status
+migrate-status:
+	@echo "Migration status:"
+	goose -dir $(MIGRATIONS_DIR) postgres $(DSN) status
+
+# Rollback all migrations
+migrate-reset:
+	@echo "Rolling back migrations..."
+	goose -dir $(MIGRATIONS_DIR) postgres $(DSN) reset
