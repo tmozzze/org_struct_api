@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Config - application configuration
 type Config struct {
 	Env           string      `yaml:"env" env-default:"local"`
 	HTTPServer    HTTPServer  `yaml:"http_server"`
@@ -17,12 +18,14 @@ type Config struct {
 	DBDialect     string      `yaml:"db_dialect" env-default:"postgres"`
 }
 
+// HTTPServer - configuration for HTTP server
 type HTTPServer struct {
 	Address     string        `yaml:"address" env-default:"localhost:8080"`
 	Timeout     time.Duration `yaml:"timeout" env-default:"4s"`
 	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
 }
 
+// PostgresCfg - configuration for PostgreSQL database
 type PostgresCfg struct {
 	Host     string `yaml:"host" env:"POSTGRES_HOST" env-required:"true"`
 	Port     string `yaml:"port" env:"POSTGRES_INTERNAL_PORT" env-default:"5432"`
@@ -37,6 +40,7 @@ type PostgresCfg struct {
 	ConnMaxLifetime time.Duration `yaml:"conn_max_lifetime" env-default:"30m"`
 }
 
+// DSN - build Data Source Name for PostgreSQL connection
 func (p PostgresCfg) DSN() string {
 	return "host=" + p.Host +
 		" user=" + p.User +
@@ -47,6 +51,7 @@ func (p PostgresCfg) DSN() string {
 		" TimeZone=" + p.TZ
 }
 
+// MustLoad - load configuration from file and environment variables, panic if any error occurs
 func MustLoad() *Config {
 	// Load .env
 	if err := godotenv.Load(); err != nil {
