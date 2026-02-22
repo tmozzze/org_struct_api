@@ -8,7 +8,7 @@ import (
 	"github.com/tmozzze/org_struct_api/internal/config"
 )
 
-func RunMugrations(cfg config.Config, db *sql.DB) error {
+func RunMigrations(cfg config.Config, db *sql.DB) error {
 	const op = "database.RunMigrations"
 
 	if err := goose.SetDialect(cfg.DBDialect); err != nil {

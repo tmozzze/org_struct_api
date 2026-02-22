@@ -7,7 +7,7 @@ include .env
 export
 
 # Variables
-# DSN
+# DSN FOR LOCAL
 DSN := "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_INTERNAL_PORT)/$(POSTGRES_DB)?sslmode=$(POSTGRES_SSLMODE)"
 
 APP_NAME=org_struct_api
@@ -24,7 +24,8 @@ test:
 	go test -v ./...
 
 up:
-	docker-compose up -d
+	docker-compose up --build -d
+
 
 down:
 	docker-compose down
@@ -58,3 +59,11 @@ migrate-status:
 migrate-reset:
 	@echo "Rolling back migrations..."
 	goose -dir $(MIGRATIONS_DIR) postgres $(DSN) reset
+
+
+
+# Debugging
+
+debug:
+	@echo "Current directory: $(shell pwd)"
+	@docker-compose config
