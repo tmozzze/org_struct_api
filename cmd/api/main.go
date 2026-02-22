@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/tmozzze/org_struct_api/internal/config"
+	"github.com/tmozzze/org_struct_api/pkg/database"
 )
 
 const (
@@ -24,6 +25,20 @@ func main() {
 	log.Debug("debug messages are enabled")
 
 	// Init DB (GORM)
+	db, err := database.NewPostgresDB(cfg.Postgres)
+	if err != nil {
+		log.Error("failed to init database", slog.Any("err", err))
+		os.Exit(1)
+	}
+	log.Info("database is initialized")
+
+	// Run Migrations
+	sqlDB, err := db.DB()
+	if err := database.RunMugrations(*cfg, sqlDB); err != nil {
+		log.Error("failed to run migrations", slog.Any("err", err))
+		os.Exit(1)
+	}
+	log.Info("migrations applied successfully")
 
 	// Init Repos
 
