@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
+	_ "time/tzdata"
 
 	"github.com/tmozzze/org_struct_api/internal/config"
 	"github.com/tmozzze/org_struct_api/pkg/database"
@@ -34,11 +36,13 @@ func main() {
 
 	// Run Migrations
 	sqlDB, err := db.DB()
-	if err := database.RunMugrations(*cfg, sqlDB); err != nil {
+	if err := database.RunMigrations(*cfg, sqlDB); err != nil {
 		log.Error("failed to run migrations", slog.Any("err", err))
 		os.Exit(1)
 	}
 	log.Info("migrations applied successfully")
+
+	fmt.Println("Vsyo ok")
 
 	// Init Repos
 
