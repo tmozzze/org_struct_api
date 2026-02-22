@@ -34,8 +34,21 @@ func main() {
 	}
 	log.Info("database is initialized")
 
-	// Run Migrations
 	sqlDB, err := db.DB()
+	if err != nil {
+		log.Error("failed to get sql.DB from gorm.DB", slog.Any("err", err))
+		os.Exit(1)
+	}
+	// Close DB connection on exit
+	defer func() {
+		if err := sqlDB.Close(); err != nil {
+			log.Error("failed to close database connection", slog.Any("err", err))
+		} else {
+			log.Info("database connection closed")
+		}
+	}()
+
+	// Run Migrations
 	if err := database.RunMigrations(*cfg, sqlDB); err != nil {
 		log.Error("failed to run migrations", slog.Any("err", err))
 		os.Exit(1)
