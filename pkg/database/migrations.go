@@ -8,6 +8,7 @@ import (
 	"github.com/tmozzze/org_struct_api/internal/config"
 )
 
+// RunMigrations - apply database migrations using goose
 func RunMigrations(cfg config.Config, db *sql.DB) error {
 	const op = "database.RunMigrations"
 

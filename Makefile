@@ -61,9 +61,11 @@ migrate-reset:
 	goose -dir $(MIGRATIONS_DIR) postgres $(DSN) reset
 
 
+# Linting
+lint:
+	golangci-lint run --timeout 5m
 
 # Debugging
-
 debug:
 	@echo "Current directory: $(shell pwd)"
 	@docker-compose config

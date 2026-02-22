@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+// NewPostgresDB - initialize a new GORM DB connection to PostgreSQL
 func NewPostgresDB(cfg config.PostgresCfg) (*gorm.DB, error) {
 	const op = "database.NewPostgresDB"
 
@@ -27,6 +28,9 @@ func NewPostgresDB(cfg config.PostgresCfg) (*gorm.DB, error) {
 
 	// Conection Pool
 	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get sql.DB from gorm.DB: %w", op, err)
+	}
 
 	sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
 	sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
