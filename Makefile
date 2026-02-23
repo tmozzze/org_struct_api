@@ -23,6 +23,9 @@ run:
 test:
 	go test -v ./...
 
+lint:
+	golangci-lint run --timeout 5m
+
 up:
 	docker-compose up --build -d
 
@@ -60,10 +63,6 @@ migrate-reset:
 	@echo "Rolling back migrations..."
 	goose -dir $(MIGRATIONS_DIR) postgres $(DSN) reset
 
-
-# Linting
-lint:
-	golangci-lint run --timeout 5m
 
 # Debugging
 debug:
