@@ -7,6 +7,7 @@ import (
 	_ "time/tzdata"
 
 	"github.com/tmozzze/org_struct_api/internal/config"
+	"github.com/tmozzze/org_struct_api/internal/repository/postgres"
 	"github.com/tmozzze/org_struct_api/pkg/database"
 )
 
@@ -55,9 +56,9 @@ func main() {
 	}
 	log.Info("migrations applied successfully")
 
-	fmt.Println("Vsyo ok")
-
 	// Init Repos
+	repo := postgres.NewRepository(db)
+	fmt.Println("Repository initialized:", repo)
 
 	// Init Service
 
