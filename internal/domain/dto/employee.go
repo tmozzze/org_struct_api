@@ -8,10 +8,9 @@ import (
 
 // CreateEmployeeRequest - request payload for creating an employee
 type CreateEmployeeRequest struct {
-	FullName string `json:"full_name" validate:"required,min=1,max=200"`
-	Position string `json:"position" validate:"required,min=1,max=200"`
-	// string "2026-10-31" need to parse to time.Time
-	HiredAt *string `json:"hired_at" validate:"omitempty,datetime=2006-01-02"`
+	FullName string  `json:"full_name" validate:"required,min=1,max=200"`
+	Position string  `json:"position" validate:"required,min=1,max=200"`
+	HiredAt  *string `json:"hired_at" validate:"omitempty,datetime=2006-01-02"`
 }
 
 // EmployeeResponse - response payload for employee data
