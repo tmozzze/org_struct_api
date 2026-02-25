@@ -12,18 +12,31 @@ type CreateDepartmentRequest struct {
 	ParentID *int   `json:"parent_id" validate:"omitempty,gt=0"`
 }
 
+// GetByIDRequest - request payload for getting by id
+type GetByIDRequest struct {
+	Depth            int  `json:"depth" validate:"min=1,max=5"`
+	IncludeEmployees bool `json:"include_employees"`
+}
+
 // UpdateDepartmentRequest - request payload for updating a department
 type UpdateDepartmentRequest struct {
 	Name     *string `json:"name" validate:"omitempty,min=1,max=200"`
 	ParentID *int    `json:"parent_id" validate:"omitempty,gt=0"`
 }
 
+// DeleteDepartmentRequest - request payload for deleting
+type DeleteDepartmentRequest struct {
+	Mode         string `json:"mode" validate:"required,oneof=cascade reassign"`
+	ReassignToID *int   `json:"reassign_to_id" validate:"required_if=Mode reassign,omitempty,gt=0"`
+}
+
 // DepartmentResponse - response payload for department data
 type DepartmentResponse struct {
-	ID        int                  `json:"id"`
-	Name      string               `json:"name"`
-	ParentID  *int                 `json:"parent_id,omitempty"`
-	CreatedAt time.Time            `json:"created_at"`
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	ParentID  *int      `json:"parent_id,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+
 	Employees []EmployeeResponse   `json:"employees,omitempty"`
 	Children  []DepartmentResponse `json:"children,omitempty"`
 }

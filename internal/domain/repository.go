@@ -19,6 +19,8 @@ type DepartmentRepository interface {
 	Update(ctx context.Context, id int, updates map[string]interface{}) error
 	Delete(ctx context.Context, id int) error
 	DeleteWithReassign(ctx context.Context, id int, reassignToID int) error
+	GetByNameAndParent(ctx context.Context, name string, parentID *int) (*models.Department, error)
+	GetByIDSimple(ctx context.Context, id int) (*models.Department, error)
 	Exists(ctx context.Context, id int) (bool, error)
 }
 

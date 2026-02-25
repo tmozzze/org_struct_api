@@ -6,8 +6,10 @@ import (
 	"os"
 	_ "time/tzdata"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/tmozzze/org_struct_api/internal/config"
 	"github.com/tmozzze/org_struct_api/internal/repository/postgres"
+	"github.com/tmozzze/org_struct_api/internal/service"
 	"github.com/tmozzze/org_struct_api/pkg/database"
 )
 
@@ -58,9 +60,13 @@ func main() {
 
 	// Init Repos
 	repo := postgres.NewRepository(db)
-	fmt.Println("Repository initialized:", repo)
+
+	// Init Validator
+	validate := validator.New()
 
 	// Init Service
+	svc := service.NewService(repo, log, validate)
+	fmt.Println(svc)
 
 	// Start Server (net/http)
 }
