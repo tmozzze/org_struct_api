@@ -1,13 +1,19 @@
 package main
 
 import (
-	"fmt"
+	"context"
+	"errors"
 	"log/slog"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 	_ "time/tzdata"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/tmozzze/org_struct_api/internal/config"
+	httpHandler "github.com/tmozzze/org_struct_api/internal/handler/http"
 	"github.com/tmozzze/org_struct_api/internal/repository/postgres"
 	"github.com/tmozzze/org_struct_api/internal/service"
 	"github.com/tmozzze/org_struct_api/pkg/database"
@@ -66,9 +72,44 @@ func main() {
 
 	// Init Service
 	svc := service.NewService(repo, log, validate)
-	fmt.Println(svc)
 
-	// Start Server (net/http)
+	// Init Handlers
+	handler := httpHandler.NewHandler(svc, log)
+
+	// Router
+	router := httpHandler.NewRouter(handler)
+
+	// Start Server
+	server := &http.Server{
+		Addr:         cfg.HTTPServer.Address,
+		Handler:      router,
+		ReadTimeout:  cfg.HTTPServer.Timeout,
+		WriteTimeout: cfg.HTTPServer.Timeout,
+		IdleTimeout:  cfg.HTTPServer.IdleTimeout,
+	}
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Error("failed to start server", slog.String("err", err.Error()))
+			os.Exit(1)
+		}
+	}()
+
+	log.Info("server started", slog.String("addr", cfg.HTTPServer.Address))
+
+	// signal
+	<-done
+	log.Info("stopping server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Error("server forced to shutdown", slog.String("err", err.Error()))
+	}
 }
 
 func setupLogger(env string) *slog.Logger {
