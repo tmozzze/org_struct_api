@@ -24,7 +24,17 @@ func NewHandler(services domain.Service, log *slog.Logger) *Handler {
 	}
 }
 
-// CreateDepartment - HTTP handler for creating a new department
+// CreateDepartment godoc
+// @Summary Create department
+// @Description Create department
+// @Tags departments
+// @Accept json
+// @Produce json
+// @Param input body dto.CreateDepartmentRequest true "Department data"
+// @Success 201 {object} dto.DepartmentResponse
+// @Failure 400 {object} errorResponse
+// @Failure 409 {object} errorResponse
+// @Router /departments [post]
 func (h *Handler) CreateDepartment(w http.ResponseWriter, r *http.Request) {
 	const op = "handler.CreateDepartment"
 
@@ -48,7 +58,18 @@ func (h *Handler) CreateDepartment(w http.ResponseWriter, r *http.Request) {
 	renderJSON(w, http.StatusCreated, resp)
 }
 
-// GetDepartment - HTTP handler for retrieving a department by ID
+// GetDepartment godoc
+// @Summary Get department with details
+// @Description Return department with children and employees
+// @Tags departments
+// @Accept json
+// @Produce json
+// @Param id path int true "Department ID"
+// @Param depth query int false "Tree depth (1-5)" default(1)
+// @Param include_employees query bool false "With employees" default(true)
+// @Success 200 {object} dto.DepartmentResponse
+// @Failure 404 {object} errorResponse
+// @Router /departments/{id} [get]
 func (h *Handler) GetDepartment(w http.ResponseWriter, r *http.Request) {
 	const op = "handler.GetDepartment"
 
@@ -88,7 +109,18 @@ func (h *Handler) GetDepartment(w http.ResponseWriter, r *http.Request) {
 	renderJSON(w, http.StatusOK, resp)
 }
 
-// UpdateDepartment - HTTP handler for updating a department by ID
+// UpdateDepartment godoc
+// @Summary Update department
+// @Description Update name and parent ID
+// @Tags departments
+// @Accept json
+// @Produce json
+// @Param id path int true "Department ID"
+// @Param input body dto.UpdateDepartmentRequest true "New data"
+// @Success 200 {object} dto.DepartmentResponse
+// @Failure 400 {object} errorResponse
+// @Failure 409 {object} errorResponse
+// @Router /departments/{id} [patch]
 func (h *Handler) UpdateDepartment(w http.ResponseWriter, r *http.Request) {
 	const op = "handler.UpdateDepartment"
 
@@ -114,7 +146,17 @@ func (h *Handler) UpdateDepartment(w http.ResponseWriter, r *http.Request) {
 	renderJSON(w, http.StatusOK, resp)
 }
 
-// DeleteDepartment - HTTP handler for deleting a department by ID
+// DeleteDepartment godoc
+// @Summary Delete department
+// @Description Delete department in cascade mode or reassign mode
+// @Tags departments
+// @Param id path int true "Department ID"
+// @Param mode query string false "Delete mode (cascade|reassign)" Enums(cascade, reassign) default(cascade)
+// @Param reassign_to_department_id query int false "New department ID (need for reassign mode)"
+// @Success 204 "No Content"
+// @Failure 400 {object} errorResponse
+// @Failure 404 {object} errorResponse
+// @Router /departments/{id} [delete]
 func (h *Handler) DeleteDepartment(w http.ResponseWriter, r *http.Request) {
 	const op = "handler.DeleteDepartment"
 
@@ -154,7 +196,18 @@ func (h *Handler) DeleteDepartment(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// CreateEmployee - HTTP handler for creating a new employee in a department
+// CreateEmployee godoc
+// @Summary Create employee
+// @Description Create employee in department
+// @Tags employees
+// @Accept json
+// @Produce json
+// @Param id path int true "Department ID"
+// @Param input body dto.CreateEmployeeRequest true "Employee data"
+// @Success 201 {object} dto.EmployeeResponse
+// @Failure 400 {object} errorResponse
+// @Failure 404 {object} errorResponse
+// @Router /departments/{id}/employees [post]
 func (h *Handler) CreateEmployee(w http.ResponseWriter, r *http.Request) {
 	const op = "handler.CreateEmployee"
 
