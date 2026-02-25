@@ -53,26 +53,26 @@ func (s *RepoTestSuite) TestUniqueNameConstraint() {
 
 	// In Root
 	deptA := &models.Department{Name: "UniqueDept"}
-	s.NoError(s.repo.DepartmentRepo.Create(ctx, deptA))
+	s.NoError(s.repo.Department().Create(ctx, deptA))
 
 	deptB := &models.Department{Name: "UniqueDept"}
-	err := s.repo.DepartmentRepo.Create(ctx, deptB)
+	err := s.repo.Department().Create(ctx, deptB)
 	s.Error(err, "should not allow duplicate department names in Root")
 
 	// In same parent
 	childA := &models.Department{Name: "ChildDept", ParentID: &deptA.ID}
-	s.NoError(s.repo.DepartmentRepo.Create(ctx, childA))
+	s.NoError(s.repo.Department().Create(ctx, childA))
 
 	childB := &models.Department{Name: "ChildDept", ParentID: &deptA.ID}
-	err = s.repo.DepartmentRepo.Create(ctx, childB)
+	err = s.repo.Department().Create(ctx, childB)
 	s.Error(err, "should not allow duplicate department names in same parent")
 
 	// In different parents
 	deptC := &models.Department{Name: "Dept C"}
-	s.NoError(s.repo.DepartmentRepo.Create(ctx, deptC))
+	s.NoError(s.repo.Department().Create(ctx, deptC))
 
 	childC := &models.Department{Name: "ChildDept", ParentID: &deptC.ID}
-	s.NoError(s.repo.DepartmentRepo.Create(ctx, childC), "should allow duplicate department names in different parents")
+	s.NoError(s.repo.Department().Create(ctx, childC), "should allow duplicate department names in different parents")
 
 }
 
@@ -82,13 +82,13 @@ func (s *RepoTestSuite) TestGetByID_RecursiveTree() {
 
 	// Root --> Child ->> Grandchild
 	root := &models.Department{Name: "Root"}
-	s.NoError(s.repo.DepartmentRepo.Create(ctx, root))
+	s.NoError(s.repo.Department().Create(ctx, root))
 
 	child := &models.Department{Name: "Child", ParentID: &root.ID}
-	s.NoError(s.repo.DepartmentRepo.Create(ctx, child))
+	s.NoError(s.repo.Department().Create(ctx, child))
 
 	grandChild := &models.Department{Name: "Grandchild", ParentID: &child.ID}
-	s.NoError(s.repo.DepartmentRepo.Create(ctx, grandChild))
+	s.NoError(s.repo.Department().Create(ctx, grandChild))
 
 	// Create employee
 	emp := &models.Employee{
@@ -96,10 +96,10 @@ func (s *RepoTestSuite) TestGetByID_RecursiveTree() {
 		Position:     "Developer",
 		DepartmentID: grandChild.ID,
 	}
-	s.NoError(s.repo.EmployeeRepo.Create(ctx, emp))
+	s.NoError(s.repo.Employee().Create(ctx, emp))
 
 	// Root with depth = 2
-	res, err := s.repo.DepartmentRepo.GetByID(ctx, root.ID, 2, true)
+	res, err := s.repo.Department().GetByID(ctx, root.ID, 2, true)
 
 	s.NoError(err)
 	s.Equal("Root", res.Name)
@@ -116,22 +116,22 @@ func (s *RepoTestSuite) TestDeleteWithReassign() {
 	ctx := context.Background()
 
 	deptA := &models.Department{Name: "Dept A"}
-	s.NoError(s.repo.DepartmentRepo.Create(ctx, deptA))
+	s.NoError(s.repo.Department().Create(ctx, deptA))
 
 	deptB := &models.Department{Name: "Dept B"}
-	s.NoError(s.repo.DepartmentRepo.Create(ctx, deptB))
+	s.NoError(s.repo.Department().Create(ctx, deptB))
 
 	emp := &models.Employee{
 		FullName:     "Oleg Moroz",
 		Position:     "Developer",
 		DepartmentID: deptA.ID,
 	}
-	s.NoError(s.repo.EmployeeRepo.Create(ctx, emp))
+	s.NoError(s.repo.Employee().Create(ctx, emp))
 
-	err := s.repo.DepartmentRepo.DeleteWithReassign(ctx, deptA.ID, deptB.ID)
+	err := s.repo.Department().DeleteWithReassign(ctx, deptA.ID, deptB.ID)
 	s.NoError(err)
 
-	exists, _ := s.repo.DepartmentRepo.Exists(ctx, deptA.ID)
+	exists, _ := s.repo.Department().Exists(ctx, deptA.ID)
 	s.False(exists, "Dept A should be deleted")
 
 	var empRes models.Employee
