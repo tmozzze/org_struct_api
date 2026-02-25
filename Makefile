@@ -26,9 +26,12 @@ test:
 lint:
 	golangci-lint run --timeout 5m
 
+# Swagger docs gen
+swagger-gen:
+	swag init -g cmd/api/main.go -o docs
+
 up:
 	docker-compose up --build -d
-
 
 down:
 	docker-compose down

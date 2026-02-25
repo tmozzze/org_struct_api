@@ -1,0 +1,260 @@
+basePath: /
+definitions:
+  dto.CreateDepartmentRequest:
+    properties:
+      name:
+        maxLength: 200
+        minLength: 1
+        type: string
+      parent_id:
+        type: integer
+    required:
+    - name
+    type: object
+  dto.CreateEmployeeRequest:
+    properties:
+      full_name:
+        maxLength: 200
+        minLength: 1
+        type: string
+      hired_at:
+        type: string
+      position:
+        maxLength: 200
+        minLength: 1
+        type: string
+    required:
+    - full_name
+    - position
+    type: object
+  dto.DepartmentResponse:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/dto.DepartmentResponse'
+        type: array
+      created_at:
+        type: string
+      employees:
+        items:
+          $ref: '#/definitions/dto.EmployeeResponse'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      parent_id:
+        type: integer
+    type: object
+  dto.EmployeeResponse:
+    properties:
+      created_at:
+        type: string
+      department_id:
+        type: integer
+      full_name:
+        type: string
+      hired_at:
+        type: string
+      id:
+        type: integer
+      position:
+        type: string
+    type: object
+  dto.UpdateDepartmentRequest:
+    properties:
+      name:
+        maxLength: 200
+        minLength: 1
+        type: string
+      parent_id:
+        type: integer
+    type: object
+  http.errorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API server for Organization Structure
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Organization Structure API
+  version: "1.0"
+paths:
+  /departments:
+    post:
+      consumes:
+      - application/json
+      description: Create department
+      parameters:
+      - description: Department data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateDepartmentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.DepartmentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Create department
+      tags:
+      - departments
+  /departments/{id}:
+    delete:
+      description: Delete department in cascade mode or reassign mode
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - default: cascade
+        description: Delete mode (cascade|reassign)
+        enum:
+        - cascade
+        - reassign
+        in: query
+        name: mode
+        type: string
+      - description: New department ID (need for reassign mode)
+        in: query
+        name: reassign_to_department_id
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Delete department
+      tags:
+      - departments
+    get:
+      consumes:
+      - application/json
+      description: Return department with children and employees
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - default: 1
+        description: Tree depth (1-5)
+        in: query
+        name: depth
+        type: integer
+      - default: true
+        description: With employees
+        in: query
+        name: include_employees
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DepartmentResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Get department with details
+      tags:
+      - departments
+    patch:
+      consumes:
+      - application/json
+      description: Update name and parent ID
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateDepartmentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DepartmentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Update department
+      tags:
+      - departments
+  /departments/{id}/employees:
+    post:
+      consumes:
+      - application/json
+      description: Create employee in department
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Employee data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateEmployeeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.EmployeeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Create employee
+      tags:
+      - employees
+swagger: "2.0"
